@@ -1,5 +1,0 @@
-com\sp\dataacquisitionprocedure\DataAcquisitionProcedureApplication.class
-com\sp\dataacquisitionprocedure\entity\ClassLog.class
-com\sp\dataacquisitionprocedure\scheduler\CsvImportScheduler.class
-com\sp\dataacquisitionprocedure\repository\ClassLogRepository.class
-com\sp\dataacquisitionprocedure\service\CsvImportService.class
