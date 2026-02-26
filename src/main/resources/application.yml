@@ -3,9 +3,9 @@ spring:
     name: DataAcquisitionProcedure
   
   datasource:
-    url: jdbc:mysql://localhost:3306/student_handbook?useSSL=false&serverTimezone=Asia/Taipei&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&connectionCollation=utf8mb4_unicode_ci&autoReconnect=true&failOverReadOnly=false&maxReconnects=10&initialTimeout=2&connectTimeout=60000&socketTimeout=60000
-    username: root
-    password: root
+    url: jdbc:mysql://10.32.96.45:3306/student_handbook?useSSL=false&serverTimezone=Asia/Taipei&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&connectionCollation=utf8mb4_unicode_ci&autoReconnect=true&failOverReadOnly=false&maxReconnects=10&initialTimeout=2&connectTimeout=60000&socketTimeout=60000
+    username: dba_user
+    password: StrongP@ssw0rd
     driver-class-name: com.mysql.cj.jdbc.Driver
   
 # MyBatis配置
