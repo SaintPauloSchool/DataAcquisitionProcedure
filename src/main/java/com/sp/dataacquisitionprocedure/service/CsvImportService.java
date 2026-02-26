@@ -56,6 +56,11 @@ public class CsvImportService {
         StringBuilder result = new StringBuilder();
         AtomicInteger successCount = new AtomicInteger(0);
         AtomicInteger errorCount = new AtomicInteger(0);
+
+        // 先刪除class_log表中所有現有數據
+        logger.info("開始刪除class_log表中所有現有數據");
+        classLogRepository.deleteAllRecords();
+        logger.info("已刪除class_log表中所有數據");
         
         try {
             Path path = Paths.get(uploadPath);
