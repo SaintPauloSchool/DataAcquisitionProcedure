@@ -1,6 +1,6 @@
-package com.sp.dataacquisitionprocedure.scheduler;
+package sp.dataacquisitionprocedure.scheduler;
 
-import com.sp.dataacquisitionprocedure.service.CsvImportService;
+import sp.dataacquisitionprocedure.service.CsvImportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +20,10 @@ public class CsvImportScheduler {
     private CsvImportService csvImportService;
     
     /**
-     * 定時任務：週一到週五晚上7點50分執行
+     * 定時任務：週一到週五晚上17點30分執行
      * cron表達式：秒
      * 分 時 日 月 週
-     * 0 50 19 * * MON-FRI 表示週一到週五的19:50:00執行
+     * 0 30 17 * * MON-FRI 表示週一到週五的17:30:00執行
      */
     @Scheduled(cron = "0 30 17 * * MON-FRI")
     public void scheduledCsvImport() {

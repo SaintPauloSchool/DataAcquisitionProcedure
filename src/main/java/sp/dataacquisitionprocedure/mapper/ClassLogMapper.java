@@ -1,9 +1,7 @@
-package com.sp.dataacquisitionprocedure.mapper;
+package sp.dataacquisitionprocedure.mapper;
 
-import com.sp.dataacquisitionprocedure.entity.ClassLog;
+import sp.dataacquisitionprocedure.entity.ClassLog;
 import org.apache.ibatis.annotations.*;
-
-import java.util.List;
 
 @Mapper
 public interface ClassLogMapper {

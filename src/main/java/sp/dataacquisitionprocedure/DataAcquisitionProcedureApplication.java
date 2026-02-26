@@ -1,4 +1,4 @@
-package com.sp.dataacquisitionprocedure;
+package sp.dataacquisitionprocedure;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
@@ -7,7 +7,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableScheduling
-@MapperScan("com.sp.dataacquisitionprocedure.mapper")
+@MapperScan("sp.dataacquisitionprocedure.mapper")
 public class DataAcquisitionProcedureApplication {
 
 	public static void main(String[] args) {

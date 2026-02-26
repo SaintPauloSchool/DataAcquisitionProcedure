@@ -8,25 +8,20 @@ spring:
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
   
-  # MyBatis配置
-  mybatis:
-    mapper-locations: classpath:mapper/*.xml
-    type-aliases-package: com.sp.dataacquisitionprocedure.entity
-    configuration:
-      map-underscore-to-camel-case: true
-      log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+# MyBatis配置
+mybatis:
+  mapper-locations: classpath*:/mapper/*Mapper.xml
+  type-aliases-package: sp.dataacquisitionprocedure.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
     
-  # PageHelper分頁配置
-  pagehelper:
-    helper-dialect: mysql
-    reasonable: true
-    support-methods-arguments: true
-    params: count=countSql
-  
-  task:
-    scheduling:
-      pool:
-        size: 2
+# PageHelper分頁配置
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countSql
 
 # CSV Upload Configuration
 csv:

@@ -1,4 +1,4 @@
-package com.sp.dataacquisitionprocedure.entity;
+package sp.dataacquisitionprocedure.entity;
 
 
 import java.time.LocalDateTime;

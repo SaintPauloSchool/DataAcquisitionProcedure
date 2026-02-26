@@ -5,7 +5,7 @@
 這是一個基於 Spring Boot 的 CSV 文件自動導入工具，能夠定時將 CSV 格式的課程資料導入到 MySQL 資料庫中。
 
 ### 核心功能
-- 🕐 **自動定時執行** - 每週一到週五晚上 17 點 540 分自動執行
+- 🕐 **自動定時執行** - 每週一到週五晚上 17 點 30 分自動執行
 - 📂 **批量文件處理** - 自動讀取指定目錄下所有 CSV 文件
 - 🔄 **智能數據解析** - 自動解析 CSV 內容並轉換為結構化數據
 - 💾 **資料庫整合** - 將解析後的數據寫入 MySQL 資料表
@@ -72,13 +72,13 @@ spring:
 ```yaml
 csv:
   upload:
-    path: C:\OutPut
+    path: \\10.96.48.253\Stu_Dailybook$
 ```
 
 ### 定時任務設定
 ```
-執行時間：每週一到週五 晚上 7:50
-cron 表達式：0 50 19 * * MON-FRI
+執行時間：每週一到週五 晚上 19:30
+cron 表達式：0 30 19 * * MON-FRI
 ```
 
 ## 📁 目錄結構
@@ -95,7 +95,7 @@ DataAcquisitionProcedure/
 │       └── resources/               # 配置檔案
 ├── target/                          # 編譯輸出目錄
 │   └── DataAcquisitionProcedure-0.0.1-SNAPSHOT.jar  # 可執行 JAR
-├── C:\OutPut/                       # CSV 文件目錄
+├── \\10.96.48.253\Stu_Dailybook$    # CSV 文件目錄
 └── README.md                        # 說明文件
 ```
 
@@ -109,16 +109,16 @@ DataAcquisitionProcedure/
 
 ### 檔案內容格式
 ```csv
-content,course_teacher,course_type,start_date,end_date
-數學課,數學 張老師,必修課,2026-02-24 08:00:00,2026-02-24 09:30:00
-英語課,英語 李老師,必修課,2026-02-24 10:00:00,2026-02-24 11:30:00
+"ID","標題","科目及老師","類別","開始時間","結束時間","內容類型","附件"
+"843","學科及功課注意事項","國文 招敏詩","教學日誌","2025-09-02","2025-09-02","","False"
+"844","代數式","代數 潘浩民","教學日誌","2025-09-02","2025-09-02","","False"
 ```
 
 ## 🔄 資料處理流程
 
 1. **程式啟動** → 初始化資料庫連線和定時任務
-2. **定時觸發** → 每週一到週五晚上 17:40 自動執行
-3. **文件掃描** → 讀取 `C:\OutPut` 目錄下所有 CSV 文件
+2. **定時觸發** → 每週一到週五晚上 19:30 自動執行
+3. **文件掃描** → 讀取 `\\10.96.48.253\Stu_Dailybook$` 目錄下所有 CSV 文件
 4. **數據解析** → 解析 CSV 內容轉換為 ClassLog 對象
 5. **數據寫入** → 將解析後的數據寫入資料庫
 6. **日誌記錄** → 記錄處理結果和錯誤信息
@@ -134,12 +134,12 @@ mvn clean package -DskipTests
 
 ### 專案結構說明
 ```
-com.sp.dataacquisitionprocedure
+sp.dataacquisitionprocedure
 ├── DataAcquisitionProcedureApplication.java  # 主程式入口
 ├── entity/                                   # 實體類
 │   └── ClassLog.java                        # 資料表對應實體
-├── repository/                               # 資料存取層
-│   └── ClassLogRepository.java              # JPA Repository
+├── mapper/                                   # MyBatis Mapper接口
+│   └── ClassLogMapper.java                  # 資料操作Mapper
 ├── service/                                  # 業務邏輯層
 │   └── CsvImportService.java                # CSV 處理服務
 └── scheduler/                                # 定時任務
@@ -159,7 +159,7 @@ com.sp.dataacquisitionprocedure
 1. 將 `target/DataAcquisitionProcedure-0.0.1-SNAPSHOT.jar` 複製到目標伺服器
 2. 確保目標伺服器安裝 Java 11+
 3. 創建啟動腳本或使用指令直接運行
-4. 設定 CSV 文件監控目錄 (`C:\OutPut`)
+4. 設定 CSV 文件監控目錄 (`\\10.96.48.253\Stu_Dailybook$`)
 5. 配置系統服務（可選）以實現開機自啟
 
 ### 代碼修改後的重新部署
@@ -210,5 +210,5 @@ java -jar 部署目錄\DataAcquisitionProcedure-0.0.1-SNAPSHOT.jar
 ---
 
 **版本**：1.0  
-**最後更新**：2026 年 2 月 24 日  
+**最後更新**：2026 年 2 月 26 日  
 **開發框架**：Spring Boot 2.7.18 + Java 11
