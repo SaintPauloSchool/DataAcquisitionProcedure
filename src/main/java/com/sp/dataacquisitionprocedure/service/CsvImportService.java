@@ -1,7 +1,7 @@
 package com.sp.dataacquisitionprocedure.service;
 
 import com.sp.dataacquisitionprocedure.entity.ClassLog;
-import com.sp.dataacquisitionprocedure.repository.ClassLogRepository;
+import com.sp.dataacquisitionprocedure.mapper.ClassLogMapper;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -27,7 +27,7 @@ public class CsvImportService {
     private static final Logger logger = LoggerFactory.getLogger(CsvImportService.class);
     
     @Autowired
-    private ClassLogRepository classLogRepository;
+    private ClassLogMapper classLogMapper;
     
     @Value("${csv.upload.path:D:/uploadPath}")
     private String uploadPath;
@@ -59,7 +59,7 @@ public class CsvImportService {
 
         // 先刪除class_log表中所有現有數據
         logger.info("開始刪除class_log表中所有現有數據");
-        classLogRepository.deleteAllRecords();
+        classLogMapper.deleteAll();
         logger.info("已刪除class_log表中所有數據");
         
         try {
@@ -142,7 +142,7 @@ public class CsvImportService {
                     ClassLog classLog = parseCsvRecord(record, studentClass);
                     if (classLog != null) {
                         // 讀完一條記錄立即添加到數據庫
-                        classLogRepository.save(classLog);
+                        classLogMapper.insert(classLog);
                         successCount.incrementAndGet();
                         logger.debug("已添加記錄 - 文件: {}, 班級: {}, 記錄編號: {}, ID: {}", 
                                    fileName, studentClass, recordCount, classLog.getId());

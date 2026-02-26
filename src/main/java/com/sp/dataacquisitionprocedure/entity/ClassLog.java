@@ -1,38 +1,27 @@
 package com.sp.dataacquisitionprocedure.entity;
 
-import javax.persistence.*;
+
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "class_log")
+
 public class ClassLog {
     
-    @Id
-    @Column(name = "id", length = 50)
     private String id;
     
-    @Column(name = "student_class", length = 10)
     private String studentClass;
     
-    @Column(name = "teacher", length = 50)
     private String teacher;
     
-    @Column(name = "course", length = 50)
     private String course;
     
-    @Column(name = "course_type", length = 50)
     private String courseType;
     
-    @Column(name = "content", columnDefinition = "TEXT")
     private String content;
     
-    @Column(name = "start_date", length = 20)
     private String startDate;
     
-    @Column(name = "end_date", length = 20)
     private String endDate;
     
-    @Column(name = "update_date")
     private LocalDateTime updateDate;
     
     // Constructors

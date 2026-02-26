@@ -3,19 +3,25 @@ spring:
     name: DataAcquisitionProcedure
   
   datasource:
-    url: jdbc:mysql://10.32.96.45:3306/student_handbook?useSSL=false&serverTimezone=Asia/Taipei&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&connectionCollation=utf8mb4_unicode_ci&autoReconnect=true&failOverReadOnly=false&maxReconnects=10&initialTimeout=2&connectTimeout=60000&socketTimeout=60000
-    username: dba_user
-    password: StrongP@ssw0rd
+    url: jdbc:mysql://localhost:3306/student_handbook?useSSL=false&serverTimezone=Asia/Taipei&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&connectionCollation=utf8mb4_unicode_ci&autoReconnect=true&failOverReadOnly=false&maxReconnects=10&initialTimeout=2&connectTimeout=60000&socketTimeout=60000
+    username: root
+    password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
   
-  jpa:
-    hibernate:
-      ddl-auto: none
-    show-sql: true
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
-        format_sql: true
+  # MyBatis配置
+  mybatis:
+    mapper-locations: classpath:mapper/*.xml
+    type-aliases-package: com.sp.dataacquisitionprocedure.entity
+    configuration:
+      map-underscore-to-camel-case: true
+      log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    
+  # PageHelper分頁配置
+  pagehelper:
+    helper-dialect: mysql
+    reasonable: true
+    support-methods-arguments: true
+    params: count=countSql
   
   task:
     scheduling:

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sp.dataacquisitionprocedure.mapper.ClassLogMapper">
+
+    <resultMap id="ClassLogResultMap" type="com.sp.dataacquisitionprocedure.entity.ClassLog">
+        <id property="id" column="id"/>
+        <result property="studentClass" column="student_class"/>
+        <result property="teacher" column="teacher"/>
+        <result property="course" column="course"/>
+        <result property="courseType" column="course_type"/>
+        <result property="content" column="content"/>
+        <result property="startDate" column="start_date"/>
+        <result property="endDate" column="end_date"/>
+        <result property="updateDate" column="update_date"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.sp.dataacquisitionprocedure.entity.ClassLog">
+        INSERT INTO class_log (id, student_class, teacher, course, course_type, content, start_date, end_date, update_date)
+        VALUES (#{id}, #{studentClass}, #{teacher}, #{course}, #{courseType}, #{content}, #{startDate}, #{endDate}, #{updateDate})
+    </insert>
+
+    <delete id="deleteAll">
+        DELETE FROM class_log
+    </delete>
+
+</mapper>
