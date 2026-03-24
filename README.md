@@ -1,4 +1,4 @@
-# Data Acquisition Procedure
+ # Data Acquisition Procedure
 
 ## 📋 項目簡介
 
@@ -63,7 +63,7 @@ java -jar target/DataAcquisitionProcedure-0.0.1-SNAPSHOT.jar
 # application.yml
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/student_handbook
+    url: jdbc:mysql://localhost:3306/school_student_management
     username: root
     password: root
 ```
