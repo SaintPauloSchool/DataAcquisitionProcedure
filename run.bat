@@ -17,8 +17,8 @@ if not exist "target\DataAcquisitionProcedure-0.0.1-SNAPSHOT.jar" (
 )
 
 echo Configuration:
-echo CSV Path: C:\OutPut
-echo Schedule: Mon-Fri 7:50 PM
+echo CSV Path: \\10.96.48.253\Stu_Dailybook$
+echo Schedule: Mon-Fri 17:30 PM
 echo Database: localhost:3306/school_student_management
 echo.
 
