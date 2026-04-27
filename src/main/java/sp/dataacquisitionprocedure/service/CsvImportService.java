@@ -61,6 +61,7 @@ public class CsvImportService {
         StringBuilder result = new StringBuilder();
         AtomicInteger successCount = new AtomicInteger(0);
         AtomicInteger errorCount = new AtomicInteger(0);
+        AtomicInteger skippedCount = new AtomicInteger(0);
 
         // 清空現有數據
         clearExistingData();
@@ -81,9 +82,9 @@ public class CsvImportService {
             result.append(String.format("找到 %d 個CSV文件\n", csvFiles.length));
             
             // 逐個處理CSV文件
-            processCsvFileList(csvFiles, result, successCount, errorCount);
+            processCsvFileList(csvFiles, result, successCount, errorCount, skippedCount);
             
-            appendProcessingSummary(result, successCount.get(), errorCount.get());
+            appendProcessingSummary(result, successCount.get(), errorCount.get(), skippedCount.get());
             
         } catch (Exception e) {
             result.append("處理過程中發生錯誤: ").append(e.getMessage());
@@ -96,7 +97,7 @@ public class CsvImportService {
     /**
      * 處理單個CSV文件
      */
-    private void processSingleCsvFile(File csvFile, AtomicInteger successCount, AtomicInteger errorCount) throws IOException {
+    private void processSingleCsvFile(File csvFile, AtomicInteger successCount, AtomicInteger errorCount, AtomicInteger skippedCount) throws IOException {
         String fileName = csvFile.getName();
         
         // 從文件名提取班級信息
@@ -113,7 +114,7 @@ public class CsvImportService {
              CSVParser csvParser = createCsvParser(reader)) {
             
             // 處理每一行數據
-            processCsvRecords(csvParser, fileName, studentClass, successCount, errorCount);
+            processCsvRecords(csvParser, fileName, studentClass, successCount, errorCount, skippedCount);
         }
     }
     
@@ -150,6 +151,13 @@ public class CsvImportService {
             String teacher = courseTeacherParts.length > 1 ? courseTeacherParts[1] : "";
             
             String courseType = record.get(3); // 第四列（索引3）作為courseType
+            
+            // 過濾掉courseType為"教學日誌"或"其他"的數據
+            if ("教學日誌".equals(courseType) || "其他".equals(courseType)) {
+                logger.debug("跳過 {} 類型的記錄", courseType);
+                return null;
+            }
+            
             String startDateStr = record.get(4); // 第五列（索引4）作為startDate
             String endDateStr = record.get(5); // 第六列（索引5）作為endDate
             
@@ -206,13 +214,13 @@ public class CsvImportService {
      * 處理CSV文件列表
      */
     private void processCsvFileList(File[] csvFiles, StringBuilder result, 
-                                   AtomicInteger successCount, AtomicInteger errorCount) {
+                                   AtomicInteger successCount, AtomicInteger errorCount, AtomicInteger skippedCount) {
         for (int i = 0; i < csvFiles.length; i++) {
             File csvFile = csvFiles[i];
             logger.info("開始處理第 {}/{} 個文件: {}", i + 1, csvFiles.length, csvFile.getName());
             
             try {
-                processSingleCsvFile(csvFile, successCount, errorCount);
+                processSingleCsvFile(csvFile, successCount, errorCount, skippedCount);
                 result.append("✓ 處理文件完成: ").append(csvFile.getName()).append("\n");
                 logger.info("第 {}/{} 個文件處理完成: {}", i + 1, csvFiles.length, csvFile.getName());
             } catch (Exception e) {
@@ -232,9 +240,10 @@ public class CsvImportService {
     /**
      * 附加處理摘要
      */
-    private void appendProcessingSummary(StringBuilder result, int successCount, int errorCount) {
+    private void appendProcessingSummary(StringBuilder result, int successCount, int errorCount, int skippedCount) {
         result.append("\n處理完成!\n")
               .append(String.format("成功處理: %d 條記錄\n", successCount))
+              .append(String.format("跳過過濾: %d 條記錄\n", skippedCount))
               .append(String.format("處理失敗: %d 條記錄\n", errorCount));
     }
     
@@ -253,7 +262,7 @@ public class CsvImportService {
      * 處理CSV記錄
      */
     private void processCsvRecords(CSVParser csvParser, String fileName, String studentClass,
-                                  AtomicInteger successCount, AtomicInteger errorCount) throws IOException {
+                                  AtomicInteger successCount, AtomicInteger errorCount, AtomicInteger skippedCount) throws IOException {
         int recordCount = 0;
 
         for (CSVRecord record : csvParser) {
@@ -267,8 +276,10 @@ public class CsvImportService {
                     logger.debug("已添加記錄 - 文件: {}, 班級: {}, 記錄編號: {}, ID: {}", 
                                fileName, studentClass, recordCount, classLog.getId());
                 } else {
-                    errorCount.incrementAndGet();
-                    logger.warn("解析記錄失敗 - 文件: {}, 班級: {}, 記錄編號: {}", 
+                    // parseCsvRecord返回null可能是因為被過濾或解析失敗
+                    // 這裡需要區分是被過濾還是真的解析失敗
+                    skippedCount.incrementAndGet();
+                    logger.debug("跳過記錄 - 文件: {}, 班級: {}, 記錄編號: {}", 
                               fileName, studentClass, recordCount);
                 }
             } catch (Exception e) {
@@ -277,8 +288,8 @@ public class CsvImportService {
                            fileName, studentClass, recordCount, e.getMessage());
             }
         }
-        logger.info("文件 {} 處理完成，總記錄數: {}，成功: {}，失敗: {}", 
-                   fileName, recordCount, successCount.get(), errorCount.get());
+        logger.info("文件 {} 處理完成，總記錄數: {}，成功: {}，跳過: {}，失敗: {}", 
+                   fileName, recordCount, successCount.get(), skippedCount.get(), errorCount.get());
     }
     
     /**
