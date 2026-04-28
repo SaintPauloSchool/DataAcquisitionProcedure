@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sp.dataacquisitionprocedure.mapper.ClassLogBackupMapper">
+
+    <resultMap id="ClassLogResultMap" type="sp.dataacquisitionprocedure.entity.ClassLog">
+        <id property="id" column="id"/>
+        <result property="studentClass" column="student_class"/>
+        <result property="teacher" column="teacher"/>
+        <result property="course" column="course"/>
+        <result property="courseType" column="course_type"/>
+        <result property="content" column="content"/>
+        <result property="startDate" column="start_date"/>
+        <result property="endDate" column="end_date"/>
+        <result property="updateDate" column="update_date"/>
+    </resultMap>
+
+    <!-- 查询所有class_log数据 -->
+    <select id="selectAllClassLogs" resultMap="ClassLogResultMap">
+        SELECT id, student_class, teacher, course, course_type, content, start_date, end_date, update_date
+        FROM school_student_management.class_log
+    </select>
+
+    <!-- 创建备份表 -->
+    <update id="createBackupTable">
+        CREATE TABLE IF NOT EXISTS school_student_management_class_log.${tableName} (
+            `id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+            `student_class` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+            `teacher` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+            `course` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+            `course_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+            `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
+            `start_date` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+            `end_date` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+            `update_date` datetime DEFAULT NULL
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='班级日志备份表'
+    </update>
+
+    <!-- 批量插入数据到备份表 -->
+    <insert id="batchInsertToBackupTable">
+        INSERT INTO school_student_management_class_log.${tableName} 
+        (id, student_class, teacher, course, course_type, content, start_date, end_date, update_date)
+        VALUES
+        <foreach collection="classLogs" item="log" separator=",">
+            (#{log.id}, #{log.studentClass}, #{log.teacher}, #{log.course}, #{log.courseType}, 
+             #{log.content}, #{log.startDate}, #{log.endDate}, #{log.updateDate})
+        </foreach>
+    </insert>
+
+</mapper>

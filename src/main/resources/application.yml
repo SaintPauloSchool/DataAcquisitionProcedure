@@ -10,7 +10,7 @@ spring:
   
 # MyBatis配置
 mybatis:
-  mapper-locations: classpath*:/mapper/*Mapper.xml
+  mapper-locations: classpath*:/mapper/*Mapper.xml,classpath*:/backupmapper/*Mapper.xml
   type-aliases-package: sp.dataacquisitionprocedure.entity
   configuration:
     map-underscore-to-camel-case: true

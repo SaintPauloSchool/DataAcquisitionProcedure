@@ -2,6 +2,7 @@ package sp.dataacquisitionprocedure.service;
 
 import sp.dataacquisitionprocedure.entity.ClassLog;
 import sp.dataacquisitionprocedure.mapper.ClassLogMapper;
+import sp.dataacquisitionprocedure.mapper.ClassLogBackupMapper;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -10,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,6 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -32,6 +35,9 @@ public class CsvImportService {
     @Autowired
     private ClassLogMapper classLogMapper;
     
+    @Autowired
+    private ClassLogBackupMapper classLogBackupMapper;
+    
     @Value("${csv.upload.path}")
     private String uploadPath;
     
@@ -39,25 +45,12 @@ public class CsvImportService {
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
     private static final String CSV_EXTENSION = ".csv";
     private static final String CLASS_SEPARATOR = "_";
-    
-    /**
-     * 手動導入CSV文件
-     */
-    public String importCsvFilesManually() {
-        return processCsvFiles(false);
-    }
-    
-    /**
-     * 定時任務導入CSV文件
-     */
-    public String importCsvFilesScheduled() {
-        return processCsvFiles(true);
-    }
-    
+
     /**
      * 處理CSV文件的核心方法
      */
-    private String processCsvFiles(boolean isScheduled) {
+    @Transactional(rollbackFor = Exception.class)
+    public String processCsvFiles() {
         StringBuilder result = new StringBuilder();
         AtomicInteger successCount = new AtomicInteger(0);
         AtomicInteger errorCount = new AtomicInteger(0);
@@ -85,6 +78,12 @@ public class CsvImportService {
             processCsvFileList(csvFiles, result, successCount, errorCount, skippedCount);
             
             appendProcessingSummary(result, successCount.get(), errorCount.get(), skippedCount.get());
+            
+            // 如果导入成功且有数据，则备份到另一个库
+            if (successCount.get() > 0 && errorCount.get() == 0) {
+                result.append("\n开始备份数据到 school_student_management_class_log...\n");
+                backupDataToAnotherDatabase(result);
+            }
             
         } catch (Exception e) {
             result.append("處理過程中發生錯誤: ").append(e.getMessage());
@@ -188,7 +187,6 @@ public class CsvImportService {
     private void clearExistingData() {
         logger.info("開始清空class_log表中所有現有數據");
         classLogMapper.deleteAll();
-        // TODO: 需要修復 MyBatis XML 映射問題
     }
     
     /**
@@ -299,5 +297,41 @@ public class CsvImportService {
         String dateStr = getCurrentDateStr();
         String randomNum = String.format("%06d", random.nextInt(1000000));
         return studentClass + dateStr + randomNum;
+    }
+    
+    /**
+     * 备份数据到另一个数据库
+     */
+    private void backupDataToAnotherDatabase(StringBuilder result) {
+        try {
+            // 获取当前日期作为表名后缀
+            String tableName = "class_log_" + getCurrentDateStr();
+            logger.info("开始创建备份表: {}", tableName);
+            
+            // 1. 创建备份表（如果不存在）
+            classLogBackupMapper.createBackupTable(tableName);
+            result.append("✓ 备份表 ").append(tableName).append(" 已就绪\n");
+            logger.info("备份表 {} 创建成功", tableName);
+            
+            // 2. 查询所有class_log数据
+            List<ClassLog> allClassLogs = classLogBackupMapper.selectAllClassLogs();
+            if (allClassLogs == null || allClassLogs.isEmpty()) {
+                result.append("⚠ 没有数据需要备份\n");
+                logger.warn("没有数据需要备份");
+                return;
+            }
+            
+            logger.info("查询到 {} 条数据需要备份", allClassLogs.size());
+            
+            // 3. 批量插入到备份表
+            classLogBackupMapper.batchInsertToBackupTable(tableName, allClassLogs);
+            result.append(String.format("✓ 成功备份 %d 条记录到 %s\n", allClassLogs.size(), tableName));
+            logger.info("成功备份 {} 条记录到表 {}", allClassLogs.size(), tableName);
+            
+        } catch (Exception e) {
+            logger.error("备份数据失败", e);
+            result.append("✗ 备份数据失败: ").append(e.getMessage()).append("\n");
+            // 不抛出异常，避免影响主流程
+        }
     }
 }

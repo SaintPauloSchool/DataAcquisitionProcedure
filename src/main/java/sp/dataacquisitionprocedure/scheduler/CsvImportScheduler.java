@@ -31,7 +31,7 @@ public class CsvImportScheduler {
             String currentTime = LocalDateTime.now().format(TIME_FORMATTER);
             logger.info("開始執行定時CSV文件導入任務 - {}", currentTime);
             
-            String result = csvImportService.importCsvFilesScheduled();
+            String result = csvImportService.processCsvFiles();
             
             logger.info("定時CSV文件導入任務執行完成 - {}\n{}", currentTime, result);
             
